@@ -1,58 +1,28 @@
-{
- "cells": [
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "0f34bb52",
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "import warnings\n",
-    "warnings.filterwarnings(\"ignore\") \n",
-    "\n",
-    "import pandas as pd\n",
-    "import numpy as np\n",
-    "from sklearn.metrics import confusion_matrix\n",
-    "import os, librosa\n",
-    "from tqdm import tqdm\n",
-    "import torchaudio\n",
-    "import IPython.display as ipd\n",
-    "import matplotlib.pyplot as plt\n",
-    "import seaborn as sns\n",
-    "import pickle \n"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "e790269b",
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "with open('audio_data.pkl', 'rb') as f:\n",
-    "    audio_data_df = pickle.load(f)\n"
-   ]
-  }
- ],
- "metadata": {
-  "kernelspec": {
-   "display_name": "venv",
-   "language": "python",
-   "name": "python3"
-  },
-  "language_info": {
-   "codemirror_mode": {
-    "name": "ipython",
-    "version": 3
-   },
-   "file_extension": ".py",
-   "mimetype": "text/x-python",
-   "name": "python",
-   "nbconvert_exporter": "python",
-   "pygments_lexer": "ipython3",
-   "version": "3.10.12"
-  }
- },
- "nbformat": 4,
- "nbformat_minor": 5
-}
+import numpy as np
+import torch
+from torch.utils.data import Dataset
+
+class DatasetClass(Dataset):  # 🔁 inherits from PyTorch Dataset
+    def __init__(self, data, max_len=127):
+        self.data = data  # list of (spec, label)
+        self.max_len = max_len
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, index):
+        spec, label = self.data[index]
+
+        # Pad spectrogram on time axis to max_len
+        padded_spec = np.pad(
+            spec,
+            pad_width=((0, 0), (0, self.max_len - spec.shape[1])),  # (freq_pad, time_pad)
+            mode='constant',
+            constant_values=-80  # silence in dB
+        )
+
+        # Convert to PyTorch tensors
+        padded_spec = torch.tensor(padded_spec, dtype=torch.float32).unsqueeze(0)  # shape: (1, 128, max_len)
+        label = torch.tensor(label, dtype=torch.long)
+
+        return padded_spec, label
