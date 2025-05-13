@@ -24,8 +24,8 @@ class UrbanCNN(nn.Module):  # Capital M in Module!
 
     def forward(self, x):
         x = self.pool(self.relu(self.conv1(x)))  # (B, 16, 64, 64)
-        x = self.pool(self.relu(self.conv2(x)))  # (B, 32, 32, 32)
-        x = self.pool(self.relu(self.conv3(x)))  # (B, 64, 16, 16)
+        #x = self.pool(self.relu(self.conv2(x)))  # (B, 32, 32, 32)
+        #x = self.pool(self.relu(self.conv3(x)))  # (B, 64, 16, 16)
 
         x = self.flatten(x)                      # (B, 64*16*16)
         x = self.relu(self.fc1(x))               # (B, 128)
