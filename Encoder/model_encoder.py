@@ -2,9 +2,9 @@ import torch
 import torch.nn as nn
 
 class CNN1D(nn.Module):
-    def __init__(self, input_length):
+    def __init__(self, input_length = 128):
         super(CNN1D, self).__init__()
-        self.conv1 =nn.Conv1d(in_channels=128, out_channels=256, kernel_size=3, padding=1)
+        self.conv1 =nn.Conv1d(in_channels= input_length, out_channels=256, kernel_size=3, padding=1)
         self.conv2 = nn.Conv1d(in_channels=256, out_channels=256, kernel_size=3, padding=1)
 
         self.gelu = nn.GELU()
@@ -16,7 +16,7 @@ class CNN1D(nn.Module):
 
         # Return for Transformer: (B, T, 256)
         x = x.permute(0, 2, 1)          # → (B, T, 256) #is a dimension swap 
-
+        #print(x.shape)
         return x
 
 
@@ -49,12 +49,12 @@ class EncoderBlock(nn.Module):
         # Feedforward block with residual
         x_norm = self.ln2(x)
         x = x + self.ffn(x_norm)
-
+        #print(x.shape)
         return x
 
 
 class classification(nn.Module):
-    def __init__(self, input_length, embed_dim=256, num_heads=4, mlp_dimension=512, num_classes=10, num_layers=1):
+    def __init__(self, input_length = 128, embed_dim=256, num_heads=4, mlp_dimension=512, num_classes=10, num_layers=1):
         super(classification, self).__init__()
         self.cnn = CNN1D(input_length)  # CNN1D for feature extraction
         self.positional = nn.Parameter(torch.randn(1, 128, embed_dim))  # Positional encoding
@@ -80,6 +80,6 @@ class classification(nn.Module):
         # ⬇️ Mean pooling over time (dim=1)
         x = x.mean(dim=1)  # (B, 256)
         logits = self.classifier(x)  # [B, num_classes]
-
+   
         return logits  # Probabilities over classes
 
