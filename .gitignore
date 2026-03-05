@@ -1,1 +1,22 @@
 venv/
+
+# Python cache and build artifacts
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+dist/
+build/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS / editor noise
+.DS_Store
+.vscode/
+.idea/
+
+# Model checkpoints and large artifacts (future files)
+*.pt
+*.pth
+*.ckpt
